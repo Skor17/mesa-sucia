@@ -14,7 +14,295 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      card_reports: {
+        Row: {
+          card_id: string
+          card_text: string | null
+          created_at: string
+          id: string
+          reason: string | null
+          room_code: string | null
+        }
+        Insert: {
+          card_id: string
+          card_text?: string | null
+          created_at?: string
+          id?: string
+          reason?: string | null
+          room_code?: string | null
+        }
+        Update: {
+          card_id?: string
+          card_text?: string | null
+          created_at?: string
+          id?: string
+          reason?: string | null
+          room_code?: string | null
+        }
+        Relationships: []
+      }
+      hands: {
+        Row: {
+          cards: Json
+          player_id: string
+        }
+        Insert: {
+          cards?: Json
+          player_id: string
+        }
+        Update: {
+          cards?: Json
+          player_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hands_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: true
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      players: {
+        Row: {
+          avatar: string
+          created_at: string
+          has_left: boolean
+          id: string
+          is_ready: boolean
+          last_seen: string
+          name: string
+          room_id: string
+          rounds_won: number
+          score: number
+          secret: string
+          votes_received: number
+        }
+        Insert: {
+          avatar?: string
+          created_at?: string
+          has_left?: boolean
+          id?: string
+          is_ready?: boolean
+          last_seen?: string
+          name: string
+          room_id: string
+          rounds_won?: number
+          score?: number
+          secret: string
+          votes_received?: number
+        }
+        Update: {
+          avatar?: string
+          created_at?: string
+          has_left?: boolean
+          id?: string
+          is_ready?: boolean
+          last_seen?: string
+          name?: string
+          room_id?: string
+          rounds_won?: number
+          score?: number
+          secret?: string
+          votes_received?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "players_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rooms: {
+        Row: {
+          categories: string[]
+          code: string
+          created_at: string
+          current_round_id: string | null
+          hidden_cards: string[]
+          host_player_id: string | null
+          id: string
+          max_rounds: number
+          mode: string
+          round_number: number
+          status: string
+          updated_at: string
+          used_prompts: string[]
+          used_responses: string[]
+        }
+        Insert: {
+          categories?: string[]
+          code: string
+          created_at?: string
+          current_round_id?: string | null
+          hidden_cards?: string[]
+          host_player_id?: string | null
+          id?: string
+          max_rounds?: number
+          mode?: string
+          round_number?: number
+          status?: string
+          updated_at?: string
+          used_prompts?: string[]
+          used_responses?: string[]
+        }
+        Update: {
+          categories?: string[]
+          code?: string
+          created_at?: string
+          current_round_id?: string | null
+          hidden_cards?: string[]
+          host_player_id?: string | null
+          id?: string
+          max_rounds?: number
+          mode?: string
+          round_number?: number
+          status?: string
+          updated_at?: string
+          used_prompts?: string[]
+          used_responses?: string[]
+        }
+        Relationships: []
+      }
+      rounds: {
+        Row: {
+          created_at: string
+          deadline: string | null
+          id: string
+          number: number
+          phase: string
+          presenter_id: string | null
+          prompt: Json
+          room_id: string
+          special: Json | null
+          target_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          deadline?: string | null
+          id?: string
+          number: number
+          phase?: string
+          presenter_id?: string | null
+          prompt: Json
+          room_id: string
+          special?: Json | null
+          target_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          deadline?: string | null
+          id?: string
+          number?: number
+          phase?: string
+          presenter_id?: string | null
+          prompt?: Json
+          room_id?: string
+          special?: Json | null
+          target_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rounds_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      submissions: {
+        Row: {
+          card: Json
+          created_at: string
+          id: string
+          player_id: string
+          round_id: string
+          votes: number
+        }
+        Insert: {
+          card: Json
+          created_at?: string
+          id?: string
+          player_id: string
+          round_id: string
+          votes?: number
+        }
+        Update: {
+          card?: Json
+          created_at?: string
+          id?: string
+          player_id?: string
+          round_id?: string
+          votes?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "submissions_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "submissions_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      votes: {
+        Row: {
+          created_at: string
+          id: string
+          round_id: string
+          submission_id: string
+          voter_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          round_id: string
+          submission_id: string
+          voter_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          round_id?: string
+          submission_id?: string
+          voter_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "votes_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "rounds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "votes_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "submissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "votes_voter_id_fkey"
+            columns: ["voter_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
