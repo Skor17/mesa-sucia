@@ -126,6 +126,7 @@ export type Database = {
           hidden_cards: string[]
           host_player_id: string | null
           id: string
+          max_players: number
           max_rounds: number
           mode: string
           round_number: number
@@ -142,6 +143,7 @@ export type Database = {
           hidden_cards?: string[]
           host_player_id?: string | null
           id?: string
+          max_players?: number
           max_rounds?: number
           mode?: string
           round_number?: number
@@ -158,6 +160,7 @@ export type Database = {
           hidden_cards?: string[]
           host_player_id?: string | null
           id?: string
+          max_players?: number
           max_rounds?: number
           mode?: string
           round_number?: number
