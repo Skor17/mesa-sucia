@@ -190,18 +190,26 @@ export async function getGameState(input: Credentials) {
   const fresh = await roomByCode(room.code);
   const { data: players = [] } = await supabaseAdmin.from("players").select("id,name,avatar,score,rounds_won,votes_received,is_ready,has_left,last_seen,created_at").eq("room_id", room.id).eq("has_left", false).order("created_at");
   const { data: hand } = await supabaseAdmin.from("hands").select("cards").eq("player_id", player.id).maybeSingle();
-  let round = null;
-  let submissions: unknown[] = [];
+  type RoundView = { id: string; number: number; phase: string; prompt: Card; special: Special | null; presenter_id: string | null; deadline: string | null };
+  type SubmissionView = { id: string; player_id: string | null; card: Card; votes: number };
+  let round: RoundView | null = null;
+  let submissions: SubmissionView[] = [];
   let mySubmissionId: string | null = null;
   let hasVoted = false;
   if (fresh.current_round_id) {
     const { data } = await supabaseAdmin.from("rounds").select("*").eq("id", fresh.current_round_id).single();
-    round = data;
+    round = data
+      ? { id: data.id, number: data.number, phase: data.phase, prompt: data.prompt as unknown as Card, special: (data.special ?? null) as unknown as Special | null, presenter_id: data.presenter_id, deadline: data.deadline }
+      : null;
     const { data: entries = [] } = await supabaseAdmin.from("submissions").select("id,player_id,card,votes").eq("round_id", fresh.current_round_id);
     mySubmissionId = entries?.find((entry) => entry.player_id === player.id)?.id ?? null;
-    if (round?.phase !== "select") submissions = (entries ?? []).map((entry) => ({ ...entry, player_id: round?.phase === "results" ? entry.player_id : null }));
+    if (round && round.phase !== "select") {
+      const phase = round.phase;
+      submissions = (entries ?? []).map((entry) => ({ id: entry.id, card: entry.card as unknown as Card, votes: entry.votes, player_id: phase === "results" ? entry.player_id : null }));
+    }
     const { data: vote } = await supabaseAdmin.from("votes").select("id").eq("round_id", fresh.current_round_id).eq("voter_id", player.id).maybeSingle();
     hasVoted = Boolean(vote);
   }
+
   return { room: fresh, me: { id: player.id }, players: players ?? [], hand: (hand?.cards ?? []) as unknown as Card[], round, submissions, mySubmissionId, hasVoted, avatars: AVATARS };
 }
